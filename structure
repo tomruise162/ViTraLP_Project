@@ -1,0 +1,11 @@
+ViTraLPR/
+├── main.py
+├── ocr_infer.py
+├── enhancement.py
+├── yolo_detect.py
+├── weights/
+│   └── yolov11_200epochs.pt
+├── license_plate_rec_original_weights/      <-- model PaddleOCR đã export từ Kaggle
+│   ├── inference.pdiparams
+│   ├── inference.pdiparams.info
+│   └── inference.pdmodel
