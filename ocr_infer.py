@@ -7,6 +7,7 @@ import numpy as np
 # Khởi tạo PaddleOCR với model custom, chạy trên CPU
 ocr_model = PaddleOCR(
     rec_model_dir=r"D:/ViTraLP/original_weights_paddle",
+    rec_char_dict_path="D:\ViTraLP\original_weights_paddle\ppocrv5_dict.txt",  # <-- Đường dẫn tới file dict ký tự
     use_doc_orientation_classify=False,
     use_doc_unwarping=False,
     use_textline_orientation=False
