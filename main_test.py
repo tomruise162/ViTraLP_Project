@@ -4,12 +4,16 @@ import uvicorn
 import shutil
 import os
 from yolo_detect import detect_license_plates
+from enhancement import enhance_image  # Bỏ comment
+import cv2
 
 app = FastAPI()
 
 model_path = "yolo_finetuned_weights/yolo11_rainy_200_best.pt"
 UPLOAD_DIR = "uploaded_images"
+ENHANCED_DIR = "outputs/enhanced"  # Bỏ comment
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+os.makedirs(ENHANCED_DIR, exist_ok=True)  # Bỏ comment
 
 @app.post("/detect")
 def detect(file: UploadFile = File(...)):
@@ -18,16 +22,28 @@ def detect(file: UploadFile = File(...)):
     with open(file_location, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    # Chạy YOLO detection
+    # Step 1: YOLO detection
     results = detect_license_plates(file_location, model_path)
     crop_files = []
+    enhanced_files = []  
+    
     for result in results:
-        crop_files.extend(result["crops"])
+        for crop_path in result["crops"]:
+            crop_files.append(crop_path)
+            # Step 2: Enhancement
+            enhanced_img = enhance_image(crop_path)
+            # Lưu ảnh đã enhance
+            enhanced_name = os.path.splitext(os.path.basename(crop_path))[0] + "_enhanced.jpg"
+            enhanced_path = os.path.join(ENHANCED_DIR, enhanced_name)
+            cv2.imwrite(enhanced_path, cv2.cvtColor(enhanced_img, cv2.COLOR_RGB2BGR))
+            enhanced_files.append(enhanced_path)
 
-    # Xóa file tạm nếu muốn
     os.remove(file_location)
 
-    return JSONResponse(content={"cropped_files": crop_files})
+    return JSONResponse(content={
+        "cropped_files": crop_files,
+        "enhanced_files": enhanced_files
+    })
 
 if __name__ == "__main__":
     uvicorn.run("main_test:app", host="0.0.0.0", port=8001, reload=True) 

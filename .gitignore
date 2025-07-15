@@ -3,3 +3,6 @@
 /bad_finetuned_weights_paddle
 /outputs
 /uploaded_images
+unet_model_full.h5
+/enhanced_LP
+/unet.ipynb
