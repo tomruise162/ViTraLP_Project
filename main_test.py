@@ -2,7 +2,8 @@ import os
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 import uvicorn
 import shutil
 import os
@@ -18,6 +19,12 @@ UPLOAD_DIR = "uploaded_images"
 ENHANCED_DIR = "outputs/enhanced"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(ENHANCED_DIR, exist_ok=True)
+
+CROPS_DIR = "outputs/crops"
+os.makedirs(CROPS_DIR, exist_ok=True)
+app.mount("/crops", StaticFiles(directory=CROPS_DIR), name="crops")
+# Mount static files for enhanced images
+app.mount("/enhanced", StaticFiles(directory=ENHANCED_DIR), name="enhanced")
 
 @app.post("/detect")
 def detect(file: UploadFile = File(...)):
@@ -56,6 +63,14 @@ def detect(file: UploadFile = File(...)):
         "enhanced_files": enhanced_files,
         "ocr_results": ocr_results
     })
+
+# Endpoint để lấy ảnh enhanced theo tên file
+@app.get("/enhanced/{filename}")
+def get_enhanced_image(filename: str):
+    file_path = os.path.join(ENHANCED_DIR, filename)
+    if os.path.exists(file_path):
+        return FileResponse(file_path, media_type="image/jpeg")
+    return JSONResponse(content={"error": "File not found"}, status_code=404)
 
 if __name__ == "__main__":
     uvicorn.run("main_test:app", host="0.0.0.0", port=8001, reload=True) 
