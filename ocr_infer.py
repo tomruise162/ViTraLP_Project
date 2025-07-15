@@ -1,23 +1,20 @@
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = ""  # Ép PaddleOCR chỉ dùng CPU
 from paddleocr import PaddleOCR
 import cv2
 import numpy as np
-import os
 
-# Khởi tạo PaddleOCR model với model đã export từ Kaggle
+# Khởi tạo PaddleOCR với model custom, chạy trên CPU
 ocr_model = PaddleOCR(
-    rec_model_dir='D:\ViTraLP\original_weights_paddle',  # thư mục chứa model export
-    use_angle_cls=False,
-    use_space_char=True,
-    use_gpu=False  # nếu bạn có GPU và cài PaddlePaddle-GPU thì để True
+    rec_model_dir=r"D:/ViTraLP/original_weights_paddle",
+    use_doc_orientation_classify=False,
+    use_doc_unwarping=False,
+    use_textline_orientation=False
 )
 
 def recognize_text(img_bgr):
     """
-    Nhận diện ký tự từ ảnh BGR bằng PaddleOCRv5 đã fine-tuned.
-    Input:
-        - img_bgr: ảnh biển số dạng numpy BGR (từ OpenCV)
-    Output:
-        - text: chuỗi ký tự được nhận dạng
+    Nhận diện ký tự từ ảnh BGR (numpy) hoặc đường dẫn file bằng PaddleOCR
     """
     if isinstance(img_bgr, str):
         # Nếu đầu vào là đường dẫn file
