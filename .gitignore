@@ -2,11 +2,13 @@
 /yolo_finetuned_weights
 /bad_finetuned_weights_paddle
 /outputs
+/output_yolo_crop_test
 /uploaded_images
 unet_model_full.h5
 /enhanced_LP
 /unet.ipynb
 /ViLP_rainy_crop_original
+/Paddle_demo.ipynb
 
 # Created by https://www.toptal.com/developers/gitignore/api/node
 # Edit at https://www.toptal.com/developers/gitignore?templates=node

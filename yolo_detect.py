@@ -38,7 +38,7 @@ def detect_license_plates(image_paths: Union[str, List[str]], model_path, save_d
 
 # Example usage
 if __name__ == "__main__":
-    image_paths = []  
+    image_paths = [r"C:\Users\ADMIN\Desktop\test_real\z6816571173696_443779b164b3e8a5f275ab404871f4b6.jpg"]  
     model_path = "yolo_finetuned_weights/yolo11_rainy_200_best.pt"  # Đường dẫn mới
     results = detect_license_plates(image_paths, model_path)
     for result in results:

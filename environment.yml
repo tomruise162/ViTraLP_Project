@@ -11,8 +11,6 @@ dependencies:
   - _py-xgboost-mutex=2.0=cpu_0
   - aiohappyeyeballs=2.4.4=py310haa95532_0
   - aiosignal=1.2.0=pyhd3eb1b0_0
-  - albucore=0.0.23=pyhd8ed1ab_0
-  - albumentations=2.0.4=pyhd8ed1ab_0
   - annotated-types=0.6.0=py310haa95532_0
   - ansi2html=1.9.1=py310haa95532_0
   - anyio=4.6.2=py310haa95532_0
@@ -41,9 +39,9 @@ dependencies:
   - brotli-bin=1.0.9=h827c3e9_9
   - bzip2=1.0.8=h2bbff1b_6
   - c-ares=1.19.1=h2bbff1b_0
-  - ca-certificates=2025.2.25=haa95532_0
-  - cairo=1.16.0=hc68a040_5
-  - certifi=2025.6.15=py310haa95532_0
+  - ca-certificates=2025.7.14=h4c7d964_0
+  - cairo=1.16.0=h85cdd14_6
+  - certifi=2025.7.14=py310haa95532_0
   - cffi=1.17.1=py310h827c3e9_1
   - charset-normalizer=3.3.2=pyhd3eb1b0_0
   - click=8.1.7=py310haa95532_0
@@ -76,12 +74,10 @@ dependencies:
   - eigen=3.4.0=h59b6b97_0
   - email-validator=2.2.0=pyhd8ed1ab_1
   - email_validator=2.2.0=hd8ed1ab_1
-  - eval-type-backport=0.2.2=pyhd8ed1ab_0
-  - eval_type_backport=0.2.2=pyha770c72_0
   - eventlet=0.39.0=py310haa95532_0
   - exceptiongroup=1.2.2=pyhd8ed1ab_1
   - executing=2.1.0=pyhd8ed1ab_1
-  - expat=2.6.4=h8ddb27b_0
+  - expat=2.7.1=h8ddb27b_0
   - farama-notifications=0.0.4=py310haa95532_0
   - fastapi=0.115.7=pyhd8ed1ab_0
   - fastapi-cli=0.0.7=pyhd8ed1ab_0
@@ -99,8 +95,8 @@ dependencies:
   - future=1.0.0=py310haa95532_0
   - gflags=2.2.2=hd77b12b_1
   - giflib=5.2.2=h7edc060_0
-  - glib=2.78.4=hd77b12b_0
-  - glib-tools=2.78.4=hd77b12b_0
+  - glib=2.84.2=h232b036_0
+  - glib-tools=2.84.2=h08ed4da_0
   - glog=0.5.0=hd77b12b_1
   - gmpy2=2.1.2=py310h7f96b67_0
   - graphite2=1.3.14=hd77b12b_1
@@ -117,6 +113,7 @@ dependencies:
   - icc_rt=2022.1.0=h6049295_2
   - icu=58.2=ha925a31_3
   - idna=3.7=py310haa95532_0
+  - imageio=2.37.0=py310haa95532_0
   - importlib-metadata=8.5.0=pyha770c72_1
   - intel-openmp=2023.1.0=h59b6b97_46320
   - ipykernel=6.29.5=pyh4bbf305_0
@@ -133,6 +130,7 @@ dependencies:
   - jupyterlab_widgets=3.0.13=pyhd8ed1ab_1
   - kiwisolver=1.4.4=py310hd77b12b_0
   - krb5=1.20.1=h5b6d351_0
+  - lazy_loader=0.4=py310haa95532_0
   - lcms2=2.16=hb4a4139_0
   - lerc=4.0.0=h5da7b33_0
   - libabseil=20240116.2=cxx17_h5da7b33_0
@@ -156,7 +154,7 @@ dependencies:
   - libdeflate=1.22=h5bf469e_0
   - libevent=2.1.12=h56d1f94_1
   - libffi=3.4.4=hd77b12b_1
-  - libglib=2.78.4=ha17d25a_0
+  - libglib=2.84.2=h405b238_0
   - libgrpc=1.62.2=hf25190f_0
   - libiconv=1.16=h2bbff1b_3
   - libjpeg-turbo=2.0.0=h196d8e1_0
@@ -178,7 +176,7 @@ dependencies:
   - libwebp=1.3.2=hbc33d0d_0
   - libwebp-base=1.3.2=h3d04722_1
   - libxgboost=2.1.1=h585ebfc_0
-  - libxml2=2.13.5=h24da03e_0
+  - libxml2=2.13.8=h866ff63_0
   - lightning-utilities=0.11.9=py310haa95532_0
   - lz4-c=1.9.4=h2bbff1b_1
   - markdown-it-py=2.2.0=py310haa95532_1
@@ -205,11 +203,10 @@ dependencies:
   - numpy-base=1.26.4=py310h65a83cf_0
   - opencv=4.10.0=py310h049faa4_1
   - openjpeg=2.5.2=hae555c5_0
-  - openssl=3.4.1=ha4e3fda_0
+  - openssl=3.5.1=h725018a_0
   - orc=2.0.1=hd8d391b_0
   - orjson=3.10.14=py310h636fa0f_0
   - packaging=24.2=pyhd8ed1ab_2
-  - pandas=2.1.4=py310h4ed8f06_0
   - parso=0.8.4=pyhd8ed1ab_1
   - patsy=1.0.1=py310haa95532_0
   - pcre2=10.42=h0ff8eda_1
@@ -248,6 +245,7 @@ dependencies:
   - python_abi=3.10=2_cp310
   - pytorch=2.5.1=py3.10_cuda11.8_cudnn9_0
   - pytorch-cuda=11.8=h24eeafa_6
+  - pytorch-msssim=1.0.0=pyhd8ed1ab_0
   - pytorch-mutex=1.0=cuda
   - pytz=2024.1=py310haa95532_0
   - pywin32=307=py310h9e98ed7_3
@@ -263,6 +261,7 @@ dependencies:
   - ruff=0.9.9=py310h090d742_0
   - safehttpx=0.1.6=pyhd8ed1ab_1
   - safetensors=0.4.5=py310haa69e8e_1
+  - scikit-image=0.25.2=py310h094160a_0
   - scikit-learn=1.5.2=py310h585ebfc_0
   - scipy=1.14.1=py310h8640f81_0
   - seaborn=0.13.2=py310haa95532_0
@@ -270,7 +269,6 @@ dependencies:
   - setuptools=65.5.0=py310haa95532_0
   - shellingham=1.5.0=py310haa95532_0
   - simple-websocket=1.1.0=py310haa95532_0
-  - simsimd=6.4.0=py310ha8f682b_0
   - sip=6.7.12=py310h5da7b33_1
   - six=1.17.0=pyhd8ed1ab_0
   - snappy=1.2.1=hcdb6601_0
@@ -279,7 +277,6 @@ dependencies:
   - stack_data=0.6.3=pyhd8ed1ab_1
   - starlette=0.45.3=pyha770c72_0
   - statsmodels=0.14.4=py310h827c3e9_0
-  - stringzilla=3.12.1=py310ha8f682b_0
   - tbb=2021.8.0=h59b6b97_0
   - tenacity=9.0.0=py310haa95532_0
   - tensorboardx=2.2=pyhd3eb1b0_0
@@ -301,15 +298,15 @@ dependencies:
   - typing_extensions=4.12.2=py310haa95532_0
   - tzdata=2024b=h04d1e81_0
   - ucrt=10.0.22621.0=h57928b3_1
-  - ultralytics=8.3.62=pyh101cb37_0
+  - ultralytics=8.3.168=pyh2a12c56_0
   - unicodedata2=15.1.0=py310h827c3e9_1
   - urllib3=2.2.3=py310haa95532_0
   - utf8proc=2.6.1=h2bbff1b_1
   - uvicorn=0.32.1=py310haa95532_0
   - uvicorn-standard=0.32.1=py310haa95532_0
   - vc=14.40=haa95532_2
-  - vc14_runtime=14.42.34433=he29a5d6_23
-  - vs2015_runtime=14.42.34433=hdffcdeb_23
+  - vc14_runtime=14.44.35208=h818238b_27
+  - vs2015_runtime=14.44.35208=h38c0c73_27
   - watchfiles=0.24.0=py310h636fa0f_2
   - wcwidth=0.2.13=pyhd8ed1ab_1
   - websockets=10.4=py310h827c3e9_2
@@ -332,9 +329,13 @@ dependencies:
       - aiofiles==24.1.0
       - aiohttp==3.11.18
       - aiosqlite==0.21.0
+      - astor==0.8.1
       - astunparse==1.6.3
       - async-timeout==4.0.3
+      - attrdict==2.0.1
       - automat==25.4.16
+      - babel==2.17.0
+      - bce-python-sdk==0.9.39
       - beautifulsoup4==4.13.3
       - bertviz==1.4.1
       - boto3==1.38.36
@@ -349,6 +350,7 @@ dependencies:
       - crawl4ai==0.6.2
       - cssselect==1.3.0
       - cssutils==2.11.1
+      - cython==3.1.2
       - dash-core-components==2.0.0
       - dash-html-components==2.0.0
       - dataclasses-json==0.6.7
@@ -360,6 +362,7 @@ dependencies:
       - extratools==0.8.2.1
       - fake-http-header==0.3.5
       - fake-useragent==2.2.0
+      - fire==0.7.0
       - flatbuffers==24.12.23
       - ftfy==6.3.1
       - gast==0.4.0
@@ -379,7 +382,6 @@ dependencies:
       - httpx-sse==0.4.1
       - humanize==4.12.3
       - hyperlink==21.0.0
-      - imageio==2.37.0
       - imagesize==1.4.1
       - incremental==24.7.2
       - itemadapter==0.11.0
@@ -398,8 +400,8 @@ dependencies:
       - langchain-openai==0.3.27
       - langchain-text-splitters==0.3.8
       - langsmith==0.4.5
-      - lazy-loader==0.4
       - litellm==1.68.1
+      - lmdb==1.7.2
       - lxml==5.4.0
       - lz4==4.4.3
       - markdown==3.7
@@ -421,9 +423,10 @@ dependencies:
       - opencv-contrib-python==4.10.0.84
       - openpyxl==3.1.5
       - opt-einsum==3.3.0
-      - paddleocr==3.1.0
-      - paddlepaddle-gpu==3.1.0
-      - paddlex==3.1.2
+      - paddle-bfloat==0.1.7
+      - paddlepaddle==2.5.0
+      - paddlepaddle-gpu==2.6.1
+      - pandas==2.3.1
       - parsel==1.10.0
       - pillow==10.4.0
       - playwright==1.52.0
@@ -432,22 +435,27 @@ dependencies:
       - premailer==3.10.0
       - prettytable==3.16.0
       - protego==0.4.0
-      - protobuf==3.20.3
+      - protobuf==3.20.2
       - py4j==0.10.9
       - pyasn1==0.6.1
       - pyasn1-modules==0.4.1
       - pyclipper==1.3.0.post6
+      - pycryptodome==3.23.0
       - pydantic-settings==2.10.1
       - pydispatcher==2.0.7
       - pyee==13.0.0
       - pygame==2.1.3
+      - pymupdf==1.20.2
       - pyodbc==5.2.0
       - pypdfium2==4.30.1
       - pyperclip==1.9.0
       - pyspark==3.1.2
+      - python-docx==1.2.0
       - python-dotenv==1.1.0
       - queuelib==1.8.0
       - rank-bm25==0.2.2
+      - rapidfuzz==3.13.0
+      - rarfile==4.2
       - referencing==0.36.2
       - requests-file==2.1.0
       - requests-oauthlib==2.0.0
@@ -457,7 +465,6 @@ dependencies:
       - ruamel-yaml==0.18.14
       - ruamel-yaml-clib==0.2.12
       - s3transfer==0.13.0
-      - scikit-image==0.25.2
       - scrapy==2.13.0
       - sentence-transformers==3.4.1
       - sentencepiece==0.2.0
