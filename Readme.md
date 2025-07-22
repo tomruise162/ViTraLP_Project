@@ -1,6 +1,7 @@
 🔗 Pretrained Weights
+
 You can download the pretrained weights from the following Google Drive link:
-👉 [Google Drive](https://drive.google.com/drive/folders/1tqchFpQig-Q3iDR3kzcSPCYQ-UGNSHvC?usp=sharing) - Pretrained Weights
+👉 [Google Drive](https://drive.google.com/drive/folders/1tqchFpQig-Q3iDR3kzcSPCYQ-UGNSHvC?usp=sharing) 
 
 The folder contains the following weight files:
 
