@@ -9,6 +9,7 @@ unet_model_full.h5
 /unet.ipynb
 /ViLP_rainy_crop_original
 /Paddle_demo.ipynb
+/original_weights_paddle.zip
 
 # Created by https://www.toptal.com/developers/gitignore/api/node
 # Edit at https://www.toptal.com/developers/gitignore?templates=node

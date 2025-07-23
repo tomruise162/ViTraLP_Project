@@ -23,7 +23,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-model_path = "yolo_finetuned_weights/yolo11_rainy_200_best.pt"
+model_path = r"D:\DSP_Project\Src\yolov11_200_epochs.pt"
 UPLOAD_DIR = "uploaded_images"
 ENHANCED_DIR = "outputs/enhanced"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
