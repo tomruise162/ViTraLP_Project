@@ -9,7 +9,7 @@ import uvicorn
 import shutil
 import os
 from yolo_detect import detect_license_plates
-from enhancement import enhance_image
+from enhancement_prenet import enhance_image_prenet
 from ocr_infer import recognize_text
 import cv2
 
@@ -53,7 +53,7 @@ def detect(file: UploadFile = File(...)):
             crop_name = os.path.basename(crop_path)
             crop_files.append(f"crops/{crop_name}")
             # Step 2: Enhancement
-            enhanced_img = enhance_image(crop_path)
+            enhanced_img = enhance_image_prenet(crop_path)
             # Lưu ảnh đã enhance
             enhanced_name = os.path.splitext(crop_name)[0] + "_enhanced.jpg"
             enhanced_path = os.path.join(ENHANCED_DIR, enhanced_name)
