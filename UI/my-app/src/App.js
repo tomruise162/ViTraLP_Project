@@ -24,7 +24,7 @@ function App() {
     const formData = new FormData();
     formData.append("file", selectedFile);
 
-    const res = await axios.post("http://localhost:8001/detect", formData, {
+    const res = await axios.post("http://localhost:8001/process", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
@@ -94,7 +94,7 @@ function App() {
         {ocrResults.map((item, idx) => (
           <div key={idx} style={{ marginBottom: 10 }}>
             <img
-              src={`http://localhost:8001/enhanced/${item.enhanced_file.split(/[\\/]/).pop()}`}
+              src={`http://localhost:8001/${item.enhanced_file}`}
               alt={`Enhanced ${idx}`}
               style={{ width: "100%" }}
             />
@@ -104,7 +104,7 @@ function App() {
             <button
               onClick={() =>
                 handleDownload(
-                  `http://localhost:8001/enhanced/${item.enhanced_file.split(/[\\/]/).pop()}`,
+                  `http://localhost:8001/${item.enhanced_file}`,
                   item.enhanced_file.split(/[\\/]/).pop()
                 )
               }

@@ -56,13 +56,33 @@ def enhance_image_prenet(image_path):
     # Chuyển lại RGB (giữ nguyên, vì đã là RGB)
     return save_out
 
+# if __name__ == "__main__":
+#     # Test thử
+#     test_image = r"C:\Users\ADMIN\Desktop\test_real\rainy\heavy\hv2.jpg"
+#     if os.path.exists(test_image):
+#         enhanced = enhance_image_prenet(test_image)
+#         print(f"Enhanced image shape: {enhanced.shape}")
+#         cv2.imwrite("enhanced_test.jpg", cv2.cvtColor(enhanced, cv2.COLOR_RGB2BGR))
+#         print("Saved as enhanced_test.jpg")
+#     else:
+#         print(f"Test image not found: {test_image}") 
+
 if __name__ == "__main__":
-    # Test thử
-    test_image = r"C:\Users\ADMIN\Desktop\test_real\rainy\heavy\hv2.jpg"
-    if os.path.exists(test_image):
-        enhanced = enhance_image_prenet(test_image)
-        print(f"Enhanced image shape: {enhanced.shape}")
-        cv2.imwrite("enhanced_test.jpg", cv2.cvtColor(enhanced, cv2.COLOR_RGB2BGR))
-        print("Saved as enhanced_test.jpg")
-    else:
-        print(f"Test image not found: {test_image}") 
+    input_folder = r"C:\Users\ADMIN\Desktop\test_real\rainy\medium"
+    output_folder = r"C:\Users\ADMIN\Desktop\test_real\results\medium"
+    os.makedirs(output_folder, exist_ok=True)
+
+    valid_exts = [".jpg", ".jpeg", ".png", ".bmp"]
+    image_files = [f for f in os.listdir(input_folder) if os.path.splitext(f)[1].lower() in valid_exts]
+
+    for filename in image_files:
+        input_path = os.path.join(input_folder, filename)
+        output_path = os.path.join(output_folder, filename)
+
+        try:
+            enhanced = enhance_image_prenet(input_path)
+            enhanced_bgr = cv2.cvtColor(enhanced, cv2.COLOR_RGB2BGR)
+            cv2.imwrite(output_path, enhanced_bgr)
+            print(f"Enhanced: {filename}")
+        except Exception as e:
+            print(f"Failed: {filename} - {e}")

@@ -48,4 +48,4 @@ def recognize_text(img_bgr):
         text = correct_first_two_digits(text)
         return text
     else:
-        return "[No text detected]"
+        return "frame"
