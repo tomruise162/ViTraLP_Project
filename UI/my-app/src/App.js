@@ -1,118 +1,200 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState } from 'react';
 import './App.css';
 
+const API_BASE_URL = 'http://localhost:8001';
+
 function App() {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [uploadedImage, setUploadedImage] = useState(null);
-  const [croppedImages, setCroppedImages] = useState([]);
-  const [enhancedImages, setEnhancedImages] = useState([]);
-  const [ocrResults, setOcrResults] = useState([]);
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const [processResult, setProcessResult] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
-  // Xử lý upload file
-  const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
-    setUploadedImage(URL.createObjectURL(e.target.files[0]));
-    setCroppedImages([]);
-    setEnhancedImages([]);
-    setOcrResults([]);
+  // Handle file selection
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setUploadedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+      setProcessResult(null);
+    }
   };
 
-  // Gửi file lên API
+  // Handle upload and process
   const handleUpload = async () => {
-    if (!selectedFile) return;
+    if (!uploadedFile) {
+      alert('Vui lòng chọn file để upload');
+      return;
+    }
+
+    setIsProcessing(true);
     const formData = new FormData();
-    formData.append("file", selectedFile);
+    formData.append('file', uploadedFile);
 
-    const res = await axios.post("http://localhost:8001/process", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    try {
+      const response = await fetch(`${API_BASE_URL}/process`, {
+        method: 'POST',
+        body: formData,
+      });
 
-    setCroppedImages(res.data.cropped_files);
-    setEnhancedImages(res.data.enhanced_files);
-    setOcrResults(res.data.ocr_results);
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const result = await response.json();
+      setProcessResult(result);
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      alert('Lỗi khi upload file');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
-  // Download helper
-  const handleDownload = (url, filename) => {
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    link.click();
+  // Handle search
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      alert('Vui lòng nhập từ khóa tìm kiếm');
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/search?q=${encodeURIComponent(searchQuery)}`);
+      
+      if (!response.ok) {
+        throw new Error('Search failed');
+      }
+
+      const results = await response.json();
+      setSearchResults(results);
+    } catch (error) {
+      console.error('Error searching:', error);
+      alert('Lỗi khi tìm kiếm');
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   return (
-    <div style={{ display: "flex", gap: 30, padding: 30 }}>
-      {/* PHẦN 1: Upload ảnh */}
-      <div style={{ flex: 1, border: "1px solid #ccc", padding: 10 }}>
-        <h3>1. Upload ảnh gốc</h3>
-        <input type="file" accept="image/*" onChange={handleFileChange} />
-        <button onClick={handleUpload} disabled={!selectedFile}>Upload</button>
-        {uploadedImage && (
-          <div>
-            <img src={uploadedImage} alt="Uploaded" style={{ width: "100%", marginTop: 10 }} />
-            <button
-              onClick={() => handleDownload(uploadedImage, selectedFile.name)}
-              style={{ marginTop: 10 }}
+    <div className="App">
+      <header className="App-header">
+        <h1>OCR Text Recognition System</h1>
+      </header>
+
+      <div className="container">
+        {/* Upload Section */}
+        <div className="upload-section">
+          <h2>Upload và xử lý ảnh</h2>
+          <div className="upload-area">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileSelect}
+              id="file-input"
+              className="file-input"
+            />
+            <label htmlFor="file-input" className="file-label">
+              {uploadedFile ? uploadedFile.name : 'Chọn file ảnh'}
+            </label>
+            
+            {previewUrl && (
+              <div className="preview-container">
+                <img src={previewUrl} alt="Preview" className="preview-image" />
+              </div>
+            )}
+
+            <button 
+              onClick={handleUpload} 
+              disabled={!uploadedFile || isProcessing}
+              className="upload-button"
             >
-              Download ảnh gốc
+              {isProcessing ? 'Đang xử lý...' : 'Upload và xử lý'}
             </button>
           </div>
-        )}
-      </div>
 
-      {/* PHẦN 2: Ảnh crop biển số */}
-      <div style={{ flex: 1, border: "1px solid #ccc", padding: 10 }}>
-        <h3>2. Ảnh biển số đã crop (YOLO)</h3>
-        {croppedImages.length === 0 && <p>Chưa có dữ liệu</p>}
-        {croppedImages.map((url, idx) => (
-          <div key={idx} style={{ marginBottom: 10 }}>
-            <img
-              src={`http://localhost:8001/crops/${url.split(/[\\/]/).pop()}`}
-              alt={`Crop ${idx}`}
-              style={{ width: "100%" }}
-            />
-            <button
-              onClick={() =>
-                handleDownload(
-                  `http://localhost:8001/crops/${url.split(/[\\/]/).pop()}`,
-                  url.split(/[\\/]/).pop()
-                )
-              }
-              style={{ marginTop: 5 }}
-            >
-              Download crop
-            </button>
-          </div>
-        ))}
-      </div>
+          {/* Process Results */}
+          {processResult && (
+            <div className="process-results">
+              <h3>Kết quả xử lý</h3>
+              
+              {processResult.ocr_results.length > 0 && (
+                <div className="result-section">
+                  <h4>OCR Results (Mới):</h4>
+                  {processResult.ocr_results.map((result, index) => (
+                    <div key={index} className="ocr-result">
+                      <p><strong>Text:</strong> {result.text}</p>
+                      <p><strong>File:</strong> {result.enhanced_file}</p>
+                      <img 
+                        src={`${API_BASE_URL}/${result.enhanced_file}`} 
+                        alt={result.text}
+                        className="result-image"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
 
-      {/* PHẦN 3: Ảnh enhanced + text */}
-      <div style={{ flex: 1, border: "1px solid #ccc", padding: 10 }}>
-        <h3>3. Ảnh enhanced & Text</h3>
-        {enhancedImages.length === 0 && <p>Chưa có dữ liệu</p>}
-        {ocrResults.map((item, idx) => (
-          <div key={idx} style={{ marginBottom: 10 }}>
-            <img
-              src={`http://localhost:8001/${item.enhanced_file}`}
-              alt={`Enhanced ${idx}`}
-              style={{ width: "100%" }}
-            />
-            <div style={{ margin: "5px 0", fontWeight: "bold" }}>
-              Text: {item.text}
+              {processResult.existed_results.length > 0 && (
+                <div className="result-section">
+                  <h4>Kết quả đã tồn tại:</h4>
+                  {processResult.existed_results.map((result, index) => (
+                    <div key={index} className="existed-result">
+                      <p><strong>Text:</strong> {result.text}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            <button
-              onClick={() =>
-                handleDownload(
-                  `http://localhost:8001/${item.enhanced_file}`,
-                  item.enhanced_file.split(/[\\/]/).pop()
-                )
-              }
+          )}
+        </div>
+
+        {/* Search Section */}
+        <div className="search-section">
+          <h2>Tìm kiếm</h2>
+          <div className="search-bar">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Nhập text cần tìm..."
+              className="search-input"
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+            />
+            <button 
+              onClick={handleSearch}
+              disabled={isSearching}
+              className="search-button"
             >
-              Download enhanced
+              {isSearching ? 'Đang tìm...' : 'Tìm kiếm'}
             </button>
           </div>
-        ))}
+
+          {/* Search Results */}
+          {searchResults.length > 0 && (
+            <div className="search-results">
+              <h3>Kết quả tìm kiếm ({searchResults.length})</h3>
+              <div className="results-grid">
+                {searchResults.map((result, index) => (
+                  <div key={index} className="search-result-item">
+                    <p className="recognized-text">{result.recognized_text}</p>
+                    <img 
+                      src={`${API_BASE_URL}/${result.enhanced_file_path.replace(/\\/g, '/')}`} 
+                      alt={result.recognized_text}
+                      className="search-result-image"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {searchResults.length === 0 && searchQuery && !isSearching && (
+            <p className="no-results">Không tìm thấy kết quả nào</p>
+          )}
+        </div>
       </div>
     </div>
   );

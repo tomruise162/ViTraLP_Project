@@ -12,6 +12,7 @@ from collections import defaultdict
 from enhancement_prenet_crop import enhance_image_prenet_np
 from yolo_detect import detect_license_plates
 from ocr_infer import recognize_text
+import pyodbc
 
 app = FastAPI()
 
@@ -20,7 +21,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -29,9 +30,43 @@ app.add_middleware(
 model_path = r"D:/DSP_Project/Src/yolov11_200_epochs.pt"
 OUTPUT_DIR = "outputs/enhanced"
 app.mount("/enhanced", StaticFiles(directory=OUTPUT_DIR), name="enhanced")
+app.mount("/outputs/enhanced", StaticFiles(directory=OUTPUT_DIR), name="outputs-enhanced")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
-MAX_FRAMES_PER_TEXT = 5
+# MAX_FRAMES_PER_TEXT = 5  # Không dùng nữa
 ROI_RATIO = (0.32, 0.63, 0.432, 0.336)
+
+def get_db_connection():
+    conn = pyodbc.connect(
+        "DRIVER={ODBC Driver 17 for SQL Server};"
+        "SERVER=MSI;"
+        "DATABASE=OCR_DB;"
+        "UID=sa;"
+        "PWD=123456"
+    )
+    return conn
+
+def insert_detected_number(image_path, text):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO DETECTED_NUMBER (Recognized_Text, Enhanced_File_Path) VALUES (?, ?)",
+        (text, image_path)
+    )
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+def recognized_text_exists(text):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT TOP 1 1 FROM DETECTED_NUMBER WHERE Recognized_Text = ?",
+        (text,)
+    )
+    exists = cursor.fetchone() is not None
+    cursor.close()
+    conn.close()
+    return exists
 
 def allowed_video(filename):
     return filename.lower().endswith((".mp4", ".avi", ".mov", ".mkv"))
@@ -45,9 +80,10 @@ async def process(file: UploadFile = File(...)):
     with open(file_location, "wb") as buffer:
         buffer.write(await file.read())
 
-    ocr_results = defaultdict(list)
+    ocr_results = set()  # Đổi sang set để kiểm tra trùng lặp text trong batch
     txt_lines = []
     result_files = []
+    existed_results = []  # Lưu các text đã tồn tại trong DB
 
     if allowed_video(file.filename):
         cap = cv2.VideoCapture(file_location)
@@ -72,12 +108,17 @@ async def process(file: UploadFile = File(...)):
                     if crop_img is None:
                         continue
                     text = recognize_text(crop_img)
-                    if len(ocr_results[text]) < MAX_FRAMES_PER_TEXT:
-                        safe_text = text.replace(' ', '_')
-                        out_path = os.path.join(OUTPUT_DIR, f"{safe_text}_{frame_idx}.png")
-                        cv2.imwrite(out_path, cv2.cvtColor(enhanced_roi, cv2.COLOR_RGB2BGR))
-                        txt_lines.append(f"{out_path}\t{text}\tframe:{frame_idx}")
-                        result_files.append({"file": out_path, "text": text, "frame": frame_idx})
+                    if text not in ocr_results:
+                        ocr_results.add(text)
+                        if recognized_text_exists(text):
+                            existed_results.append({"text": text})
+                        else:
+                            safe_text = text.replace(' ', '_')
+                            out_path = os.path.join(OUTPUT_DIR, f"{safe_text}_{frame_idx}.png")
+                            cv2.imwrite(out_path, cv2.cvtColor(enhanced_roi, cv2.COLOR_RGB2BGR))
+                            txt_lines.append(f"{out_path}\t{text}\tframe:{frame_idx}")
+                            result_files.append({"file": out_path, "text": text, "frame": frame_idx})
+                            insert_detected_number(out_path, text)
             frame_idx += 1
         cap.release()
     elif allowed_image(file.filename):
@@ -99,12 +140,16 @@ async def process(file: UploadFile = File(...)):
                 if crop_img is None:
                     continue
                 text = recognize_text(crop_img)
-                if len(ocr_results[text]) < MAX_FRAMES_PER_TEXT:
-                    ocr_results[text].append(0)
-                    out_path = os.path.join(OUTPUT_DIR, f"{text}_0.png")
-                    cv2.imwrite(out_path, cv2.cvtColor(enhanced_roi, cv2.COLOR_RGB2BGR))
-                    txt_lines.append(f"{out_path}\t{text}\tframe:0")
-                    result_files.append({"file": out_path, "text": text, "frame": 0})
+                if text not in ocr_results:
+                    ocr_results.add(text)
+                    if recognized_text_exists(text):
+                        existed_results.append({"text": text})
+                    else:
+                        out_path = os.path.join(OUTPUT_DIR, f"{text}_0.png")
+                        cv2.imwrite(out_path, cv2.cvtColor(enhanced_roi, cv2.COLOR_RGB2BGR))
+                        txt_lines.append(f"{out_path}\t{text}\tframe:0")
+                        result_files.append({"file": out_path, "text": text, "frame": 0})
+                        insert_detected_number(out_path, text)
     else:
         os.remove(file_location)
         return {"error": "Unsupported file type"}
@@ -138,8 +183,25 @@ async def process(file: UploadFile = File(...)):
     return {
         "cropped_files": cropped_files,  # Nếu muốn trả về crop, cần lưu crop_path ở trên
         "enhanced_files": enhanced_files,
-        "ocr_results": ocr_results_list
+        "ocr_results": ocr_results_list,
+        "existed_results": existed_results
     }
+
+@app.get("/search")
+def search_recognized_text(q: str):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT Recognized_Text, Enhanced_File_Path FROM DETECTED_NUMBER WHERE Recognized_Text LIKE ?",
+        (f"%{q}%",)
+    )
+    results = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return [{
+        "recognized_text": row[0],
+        "enhanced_file_path": row[1]
+    } for row in results]
 
 if __name__ == "__main__":
     import uvicorn
