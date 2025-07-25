@@ -16,6 +16,7 @@ Hệ thống nhận diện biển số xe máy/ô tô Việt Nam từ ảnh **ho
 ```
 .
 ├── main_test.py                # Backend FastAPI: API xử lý ảnh/video, lưu SQL Server
+├── script.sql                  # Script SQL để khởi tạo database và table
 ├── enhancement_prenet_crop.py  # Module tăng cường ảnh bằng PReNet
 ├── yolo_detect.py              # Module phát hiện biển số bằng YOLO
 ├── ocr_infer.py                # Module nhận diện ký tự bằng PaddleOCR
@@ -42,7 +43,10 @@ Hệ thống nhận diện biển số xe máy/ô tô Việt Nam từ ảnh **ho
   pip install -r requirements.txt
   ```
 - **Tải các file weights (YOLO, PReNet, PaddleOCR) theo hướng dẫn ở cuối README.**
-- **Chỉnh thông tin kết nối SQL Server trong `main_test.py` cho đúng với máy của bạn.**
+- **Chuẩn bị và cấu hình SQL Server:**
+  - Cài đặt SQL Server (nếu bạn chưa có).
+  - Chạy script trong file `script.sql` để tạo database `OCR_DB` và bảng `DETECTED_NUMBER`.
+  - Chỉnh thông tin kết nối SQL Server trong `main_test.py` cho đúng với máy của bạn (server name, user, password).
 - **Chạy server FastAPI:**
   ```bash
   python main_test.py
