@@ -102,20 +102,20 @@ npm start
 
 ## 🔗 Pretrained Weights
 
-You can download the pretrained weights from the following Google Drive link:  
+Bạn có thể tải các file weights được fine-tuned hoặc pretrained tại đường dẫn sau:  
 👉 [Google Drive](https://drive.google.com/drive/folders/1tqchFpQig-Q3iDR3kzcSPCYQ-UGNSHvC?usp=sharing)
 
-The folder contains the following weight files:
+Link drive chứa các file sau:
 
 - `yolov11_200_epochs.pth`  
-  → YOLO finetuning weights on Vietnamese License Plates
+  → YOLO finetuning weights cho biển số xe Việt Nam.
 
 - `original_weights_paddle.pth`  
-  → Original PaddleOCRv5 weights
+  → Original PaddleOCRv5 weights.
 
-- `net_latest.pth`  
-  → PReNet pretrained weights at `logs/Rain100L/PReNet6`
+- `finetuning.zip`  
+  → PReNet finetuning weights cho dataset mưa.
 
-> ✅ Please **download and place the required weights** in the appropriate directory before training or inference.
+> ✅ Hãy **tải và đặt đường dẫn trọng số** một cách phù hợp trước khi train hoặc inference.
 
 

@@ -11,13 +11,23 @@ function App() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [fileType, setFileType] = useState(null); // 'image' or 'video'
 
   // Handle file selection
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
     if (file) {
       setUploadedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+      
+      // Determine file type
+      if (file.type.startsWith('image/')) {
+        setFileType('image');
+      } else if (file.type.startsWith('video/')) {
+        setFileType('video');
+      }
+      
       setProcessResult(null);
     }
   };
@@ -78,31 +88,57 @@ function App() {
     }
   };
 
+  // Clean up preview URL when component unmounts or file changes
+  React.useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
   return (
     <div className="App">
       <header className="App-header">
         <h1>OCR Text Recognition System</h1>
+        <p>Hỗ trợ xử lý ảnh và video</p>
       </header>
 
       <div className="container">
         {/* Upload Section */}
         <div className="upload-section">
-          <h2>Upload và xử lý ảnh</h2>
+          <h2>Upload và xử lý ảnh/video</h2>
           <div className="upload-area">
             <input
               type="file"
-              accept="image/*"
+              accept="image/*,video/*"
               onChange={handleFileSelect}
               id="file-input"
               className="file-input"
             />
             <label htmlFor="file-input" className="file-label">
-              {uploadedFile ? uploadedFile.name : 'Chọn file ảnh'}
+              <i className="upload-icon">📁</i>
+              {uploadedFile ? uploadedFile.name : 'Chọn file ảnh hoặc video'}
             </label>
             
             {previewUrl && (
               <div className="preview-container">
-                <img src={previewUrl} alt="Preview" className="preview-image" />
+                {fileType === 'image' ? (
+                  <img src={previewUrl} alt="Preview" className="preview-image" />
+                ) : fileType === 'video' ? (
+                  <video controls className="preview-video">
+                    <source src={previewUrl} type={uploadedFile.type} />
+                    Your browser does not support the video tag.
+                  </video>
+                ) : null}
+                <div className="file-info">
+                  <span className={`file-type ${fileType}`}>
+                    {fileType === 'image' ? '🖼️ Ảnh' : '🎥 Video'}
+                  </span>
+                  <span className="file-size">
+                    {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
+                  </span>
+                </div>
               </div>
             )}
 
@@ -111,7 +147,14 @@ function App() {
               disabled={!uploadedFile || isProcessing}
               className="upload-button"
             >
-              {isProcessing ? 'Đang xử lý...' : 'Upload và xử lý'}
+              {isProcessing ? (
+                <>
+                  <span className="spinner"></span>
+                  Đang xử lý...
+                </>
+              ) : (
+                'Upload và xử lý'
+              )}
             </button>
           </div>
 
@@ -120,33 +163,61 @@ function App() {
             <div className="process-results">
               <h3>Kết quả xử lý</h3>
               
-              {processResult.ocr_results.length > 0 && (
+              {/* OCR Results */}
+              {processResult.ocr_results && processResult.ocr_results.length > 0 && (
                 <div className="result-section">
-                  <h4>OCR Results (Mới):</h4>
-                  {processResult.ocr_results.map((result, index) => (
-                    <div key={index} className="ocr-result">
-                      <p><strong>Text:</strong> {result.text}</p>
-                      <p><strong>File:</strong> {result.enhanced_file}</p>
-                      <img 
-                        src={`${API_BASE_URL}/${result.enhanced_file}`} 
-                        alt={result.text}
-                        className="result-image"
-                      />
-                    </div>
-                  ))}
+                  <h4>🆕 OCR Results (Mới):</h4>
+                  <div className="ocr-results-grid">
+                    {processResult.ocr_results.map((result, index) => (
+                      <div key={index} className="ocr-result">
+                        <div className="result-header">
+                          <span className="result-text">{result.text}</span>
+                          {result.frame !== undefined && (
+                            <span className="frame-info">Frame: {result.frame}</span>
+                          )}
+                        </div>
+                        <div className="result-image-container">
+                          <img 
+                            src={`${API_BASE_URL}/${result.enhanced_file}`} 
+                            alt={result.text}
+                            className="result-image"
+                            onError={(e) => {
+                              e.target.src = 'placeholder.png'; // Add a placeholder image
+                              e.target.onerror = null;
+                            }}
+                          />
+                        </div>
+                        <p className="file-path">{result.enhanced_file}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
-              {processResult.existed_results.length > 0 && (
+              {/* Existed Results */}
+              {processResult.existed_results && processResult.existed_results.length > 0 && (
                 <div className="result-section">
-                  <h4>Kết quả đã tồn tại:</h4>
-                  {processResult.existed_results.map((result, index) => (
-                    <div key={index} className="existed-result">
-                      <p><strong>Text:</strong> {result.text}</p>
-                    </div>
-                  ))}
+                  <h4>✅ Kết quả đã tồn tại:</h4>
+                  <div className="existed-results">
+                    {processResult.existed_results.map((result, index) => (
+                      <div key={index} className="existed-result">
+                        <span className="existed-text">{result.text}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
+
+              {/* Summary */}
+              <div className="result-summary">
+                <p>📊 Tổng kết:</p>
+                <ul>
+                  <li>Kết quả mới: {processResult.ocr_results?.length || 0}</li>
+                  <li>Đã tồn tại: {processResult.existed_results?.length || 0}</li>
+                  <li>File được crop: {processResult.cropped_files?.length || 0}</li>
+                  <li>File được enhance: {processResult.enhanced_files?.length || 0}</li>
+                </ul>
+              </div>
             </div>
           )}
         </div>
@@ -168,7 +239,16 @@ function App() {
               disabled={isSearching}
               className="search-button"
             >
-              {isSearching ? 'Đang tìm...' : 'Tìm kiếm'}
+              {isSearching ? (
+                <>
+                  <span className="spinner small"></span>
+                  Đang tìm...
+                </>
+              ) : (
+                <>
+                  🔍 Tìm kiếm
+                </>
+              )}
             </button>
           </div>
 
@@ -180,11 +260,17 @@ function App() {
                 {searchResults.map((result, index) => (
                   <div key={index} className="search-result-item">
                     <p className="recognized-text">{result.recognized_text}</p>
-                    <img 
-                      src={`${API_BASE_URL}/${result.enhanced_file_path.replace(/\\/g, '/')}`} 
-                      alt={result.recognized_text}
-                      className="search-result-image"
-                    />
+                    <div className="search-image-container">
+                      <img 
+                        src={`${API_BASE_URL}/${result.enhanced_file_path.replace(/\\/g, '/')}`} 
+                        alt={result.recognized_text}
+                        className="search-result-image"
+                        onError={(e) => {
+                          e.target.src = 'placeholder.png';
+                          e.target.onerror = null;
+                        }}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -192,7 +278,7 @@ function App() {
           )}
 
           {searchResults.length === 0 && searchQuery && !isSearching && (
-            <p className="no-results">Không tìm thấy kết quả nào</p>
+            <p className="no-results">Không tìm thấy kết quả nào cho "{searchQuery}"</p>
           )}
         </div>
       </div>
