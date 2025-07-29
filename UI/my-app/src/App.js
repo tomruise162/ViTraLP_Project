@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
 
-const API_BASE_URL = 'http://localhost:8001';
+const API_BASE_URL = 'http://localhost:8001'; //Đổi port ở đây để test các file main khác nhau
 
 function App() {
   const [uploadedFile, setUploadedFile] = useState(null);
@@ -208,12 +208,28 @@ function App() {
                 </div>
               )}
 
+              {/* Invalid Results */}
+              {processResult.invalid_results && processResult.invalid_results.length > 0 && (
+                <div className="result-section">
+                  <h4>❌ Kết quả không hợp lệ:</h4>
+                  <div className="invalid-results">
+                    {processResult.invalid_results.map((result, index) => (
+                      <div key={index} className="invalid-result">
+                        <span className="invalid-text">{result.text}</span>
+                        <span className="invalid-message">{result.message}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Summary */}
               <div className="result-summary">
                 <p>📊 Tổng kết:</p>
                 <ul>
                   <li>Kết quả mới: {processResult.ocr_results?.length || 0}</li>
                   <li>Đã tồn tại: {processResult.existed_results?.length || 0}</li>
+                  <li>Không hợp lệ: {processResult.invalid_results?.length || 0}</li>
                   <li>File được crop: {processResult.cropped_files?.length || 0}</li>
                   <li>File được enhance: {processResult.enhanced_files?.length || 0}</li>
                 </ul>

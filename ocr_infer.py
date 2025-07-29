@@ -3,6 +3,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = ""  # Ép PaddleOCR chỉ dùng CPU
 from paddleocr import PaddleOCR
 import cv2
 import numpy as np
+import re
 
 # Khởi tạo PaddleOCR với model custom, chạy trên CPU
 ocr_model = PaddleOCR(
@@ -12,6 +13,12 @@ ocr_model = PaddleOCR(
     use_doc_unwarping=False,
     use_textline_orientation=False
 )
+
+def contains_letter(text):
+    """
+    Kiểm tra xem text có chứa ít nhất một chữ cái hay không
+    """
+    return bool(re.search(r'[a-zA-Z]', text))
 
 def correct_first_two_digits(text):
     """
@@ -31,6 +38,32 @@ def correct_first_two_digits(text):
             new_text[i] = char_to_digit.get(new_text[i], '0')  # Nếu không map được thì cho về '0'
     return ''.join(new_text)
 
+def correct_third_character(text):
+    """
+    Fix ký tự thứ 3 bị đọc nhầm từ số thành chữ cái.
+    Ví dụ: 29A-1234 -> 29A1234, nhưng OCR có thể đọc nhầm thành 291234
+    """
+    digit_to_char = {
+        '0': 'U', '1': 'I', '2': 'Z', '3': 'B', '4': 'A', '5': 'S', 
+        '6': 'G', '7': 'T', '8': 'B', '9': 'G'
+    }
+    
+    text = text.strip()
+    if len(text) < 3:
+        return text
+    
+    new_text = list(text)
+    
+    # Kiểm tra nếu 2 ký tự đầu là số và ký tự thứ 3 cũng là số
+    if (new_text[0].isdigit() and new_text[1].isdigit() and 
+        new_text[2].isdigit() and len(text) >= 7):
+        # Có thể ký tự thứ 3 bị đọc nhầm từ chữ thành số
+        # Thử chuyển số thành chữ cái tương ứng
+        possible_char = digit_to_char.get(new_text[2], 'A')
+        new_text[2] = possible_char
+    
+    return ''.join(new_text)
+
 def recognize_text(img_bgr):
     """
     Nhận diện ký tự từ ảnh BGR (numpy) hoặc đường dẫn file bằng PaddleOCR
@@ -46,6 +79,7 @@ def recognize_text(img_bgr):
         texts = [line[1][0] for line in result[0]]
         text = ' '.join(texts)
         text = correct_first_two_digits(text)
+        text = correct_third_character(text)  # Thêm fix ký tự thứ 3
         return text
     else:
         return "frame"

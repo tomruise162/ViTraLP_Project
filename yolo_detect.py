@@ -45,7 +45,7 @@ def detect_license_plates(image_input: Union[str, np.ndarray, List[Union[str, np
 # Example usage
 if __name__ == "__main__":
     image_paths = [r"D:\DSP_Project\New_dataset\heavy_rainy\train\images\greenpack_0571_png.rf.16bba9369e13dc15cb6c6750d38ac5bb.jpg"]  
-    model_path = r"D:\DSP_Project\Src\yolov11_200_epochs.pt"  
+    model_path = r"D:\ViTraLP\yolo_finetuned_weights\yolo11_medium_rainy_200_best.pt"  
     results = detect_license_plates(image_paths, model_path)
     for result in results:
         print(f"Cropped plates for {result['image']}:")

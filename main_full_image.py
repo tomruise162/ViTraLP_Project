@@ -11,7 +11,7 @@ import numpy as np
 from collections import defaultdict
 from enhancement_prenet_crop import enhance_image_prenet_np
 from yolo_detect import detect_license_plates
-from ocr_infer import recognize_text, contains_letter
+from ocr_infer import recognize_text
 from license_plate_validator import validate_and_clean_license_plate
 import pyodbc
 import time
@@ -19,7 +19,6 @@ import time
 app = FastAPI()
 
 # Mount static files for outputs directory
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,12 +28,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-model_path = "D:\ViTraLP\yolo_finetuned_weights\yolo11_medium_rainy_200_best.pt"
+model_path = r"D:/DSP_Project/Src/yolov11_200_epochs.pt"
 OUTPUT_DIR = "outputs/enhanced"
 app.mount("/enhanced", StaticFiles(directory=OUTPUT_DIR), name="enhanced")
 app.mount("/outputs/enhanced", StaticFiles(directory=OUTPUT_DIR), name="outputs-enhanced")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
-ROI_RATIO = (0.32, 0.63, 0.432, 0.336)
 
 def get_db_connection():
     conn = pyodbc.connect(
@@ -98,14 +96,10 @@ async def process(file: UploadFile = File(...)):
             ret, frame = cap.read()
             if not ret:
                 break
-            x = int(ROI_RATIO[0] * width)
-            y = int(ROI_RATIO[1] * height)
-            w = int(ROI_RATIO[2] * width)
-            h = int(ROI_RATIO[3] * height)
-            roi = frame[y:y+h, x:x+w]
-            roi_rgb = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
-            enhanced_roi = enhance_image_prenet_np(roi_rgb)
-            yolo_results = detect_license_plates(enhanced_roi, model_path)
+            # Xử lý toàn frame thay vì ROI
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            enhanced_frame = enhance_image_prenet_np(frame_rgb)
+            yolo_results = detect_license_plates(enhanced_frame, model_path)
             for result in yolo_results:
                 for crop_path in result["crops"]:
                     crop_img = cv2.imread(crop_path) if isinstance(crop_path, str) else crop_path
@@ -114,11 +108,6 @@ async def process(file: UploadFile = File(...)):
                     text = recognize_text(crop_img)
                     if text not in ocr_results:
                         ocr_results.add(text)
-                        
-                        # Kiểm tra xem text có chứa chữ cái hay không
-                        if not contains_letter(text):
-                            invalid_results.append({"text": text})
-                            continue  # Bỏ qua, không lưu frame này
                         
                         # Validate biển số xe
                         is_valid, cleaned_text, message = validate_and_clean_license_plate(text)
@@ -133,7 +122,7 @@ async def process(file: UploadFile = File(...)):
                         else:
                             safe_text = cleaned_text.replace(' ', '_')
                             out_path = os.path.join(OUTPUT_DIR, f"{safe_text}_{frame_idx}.png")
-                            cv2.imwrite(out_path, cv2.cvtColor(enhanced_roi, cv2.COLOR_RGB2BGR))
+                            cv2.imwrite(out_path, cv2.cvtColor(enhanced_frame, cv2.COLOR_RGB2BGR))
                             txt_lines.append(f"{out_path}\t{cleaned_text}\tframe:{frame_idx}")
                             result_files.append({"file": out_path, "text": cleaned_text, "frame": frame_idx})
                             insert_detected_number(out_path, cleaned_text)
@@ -143,15 +132,10 @@ async def process(file: UploadFile = File(...)):
         img = cv2.imread(file_location)
         if img is None:
             return {"error": "Cannot read image"}
-        height, width = img.shape[:2]
-        x = int(ROI_RATIO[0] * width)
-        y = int(ROI_RATIO[1] * height)
-        w = int(ROI_RATIO[2] * width)
-        h = int(ROI_RATIO[3] * height)
-        roi = img[y:y+h, x:x+w]
-        roi_rgb = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
-        enhanced_roi = enhance_image_prenet_np(roi_rgb)
-        yolo_results = detect_license_plates(enhanced_roi, model_path)
+        # Xử lý toàn ảnh thay vì ROI
+        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        enhanced_img = enhance_image_prenet_np(img_rgb)
+        yolo_results = detect_license_plates(enhanced_img, model_path)
         for result in yolo_results:
             for crop_path in result["crops"]:
                 crop_img = cv2.imread(crop_path) if isinstance(crop_path, str) else crop_path
@@ -160,11 +144,6 @@ async def process(file: UploadFile = File(...)):
                 text = recognize_text(crop_img)
                 if text not in ocr_results:
                     ocr_results.add(text)
-                    
-                    # Kiểm tra xem text có chứa chữ cái hay không
-                    if not contains_letter(text):
-                        invalid_results.append({"text": text})
-                        continue  # Bỏ qua, không lưu frame này
                     
                     # Validate biển số xe
                     is_valid, cleaned_text, message = validate_and_clean_license_plate(text)
@@ -178,7 +157,7 @@ async def process(file: UploadFile = File(...)):
                         existed_results.append({"text": cleaned_text})
                     else:
                         out_path = os.path.join(OUTPUT_DIR, f"{cleaned_text}_0.png")
-                        cv2.imwrite(out_path, cv2.cvtColor(enhanced_roi, cv2.COLOR_RGB2BGR))
+                        cv2.imwrite(out_path, cv2.cvtColor(enhanced_img, cv2.COLOR_RGB2BGR))
                         txt_lines.append(f"{out_path}\t{cleaned_text}\tframe:0")
                         result_files.append({"file": out_path, "text": cleaned_text, "frame": 0})
                         insert_detected_number(out_path, cleaned_text)
@@ -244,4 +223,4 @@ def search_recognized_text(q: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main_test:app", host="0.0.0.0", port=8001, reload=True) 
+    uvicorn.run("main_full_image:app", host="0.0.0.0", port=8001, reload=True) 
