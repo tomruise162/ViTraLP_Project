@@ -28,7 +28,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-model_path = r"D:/DSP_Project/Src/yolov11_200_epochs.pt"
+model_path = r"D:\ViTraLP\yolo_finetuned_weights\yolo11_medium_rainy_200_best.pt"
 OUTPUT_DIR = "outputs/enhanced"
 app.mount("/enhanced", StaticFiles(directory=OUTPUT_DIR), name="enhanced")
 app.mount("/outputs/enhanced", StaticFiles(directory=OUTPUT_DIR), name="outputs-enhanced")
@@ -99,7 +99,7 @@ async def process(file: UploadFile = File(...)):
             # Xử lý toàn frame thay vì ROI
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             enhanced_frame = enhance_image_prenet_np(frame_rgb)
-            yolo_results = detect_license_plates(enhanced_frame, model_path)
+            yolo_results = detect_license_plates(enhanced_frame, model_path, frame_idx=frame_idx)
             for result in yolo_results:
                 for crop_path in result["crops"]:
                     crop_img = cv2.imread(crop_path) if isinstance(crop_path, str) else crop_path
@@ -135,7 +135,7 @@ async def process(file: UploadFile = File(...)):
         # Xử lý toàn ảnh thay vì ROI
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         enhanced_img = enhance_image_prenet_np(img_rgb)
-        yolo_results = detect_license_plates(enhanced_img, model_path)
+        yolo_results = detect_license_plates(enhanced_img, model_path, frame_idx=0)
         for result in yolo_results:
             for crop_path in result["crops"]:
                 crop_img = cv2.imread(crop_path) if isinstance(crop_path, str) else crop_path

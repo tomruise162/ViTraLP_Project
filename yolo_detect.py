@@ -3,8 +3,9 @@ import cv2
 import os
 import numpy as np
 from typing import Union, List
+import time
 
-def detect_license_plates(image_input: Union[str, np.ndarray, List[Union[str, np.ndarray]]], model_path, save_dir="outputs/crops", conf_thresh=0.4):
+def detect_license_plates(image_input: Union[str, np.ndarray, List[Union[str, np.ndarray]]], model_path, save_dir="outputs/crops", conf_thresh=0.4, frame_idx=None):
     os.makedirs(save_dir, exist_ok=True)
 
     # Load model
@@ -34,7 +35,14 @@ def detect_license_plates(image_input: Union[str, np.ndarray, List[Union[str, np
         for i, (x1, y1, x2, y2) in enumerate(boxes):
             x1, y1, x2, y2 = map(int, [x1, y1, x2, y2])
             crop = image[y1:y2, x1:x2]
-            crop_path = os.path.join(save_dir, f"{img_name}_plate_{i}.jpg")
+            
+            # Tạo tên file unique để tránh ghi đè
+            if frame_idx is not None:
+                crop_path = os.path.join(save_dir, f"{img_name}_frame_{frame_idx}_plate_{i}.jpg")
+            else:
+                timestamp = int(time.time() * 1000)  # milliseconds
+                crop_path = os.path.join(save_dir, f"{img_name}_ts_{timestamp}_plate_{i}.jpg")
+            
             cv2.imwrite(crop_path, crop)
             cropped_paths.append(crop_path)
 

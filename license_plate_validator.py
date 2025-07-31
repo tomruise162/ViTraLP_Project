@@ -49,7 +49,7 @@ def validate_and_clean_license_plate(text):
         - message: str - thông báo lỗi nếu có
     """
     if not text:
-        return False, "", "Không có ký tự biển số xe hợp lệ"
+        return False, "", "Biển số xe không hợp lệ"
     
     # Loại bỏ khoảng trắng và chuyển về chữ hoa
     cleaned_text = text.strip().upper()
@@ -62,14 +62,14 @@ def validate_and_clean_license_plate(text):
     
     # Kiểm tra độ dài tối thiểu (7 ký tự)
     if len(length_check_text) < 7:
-        return False, cleaned_text, "Biển số xe quá ngắn"
+        return False, cleaned_text, "Biển số xe không hợp lệ"
     
     # Kiểm tra độ dài tối đa (9 ký tự)
     if len(length_check_text) > 9:
-        return False, cleaned_text, "Biển số xe quá dài"
+        return False, cleaned_text, "Biển số xe không hợp lệ"
     
     # Kiểm tra định dạng
     if is_valid_vietnamese_license_plate(cleaned_text):
         return True, cleaned_text, "Biển số xe hợp lệ"
     else:
-        return False, cleaned_text, "Không có ký tự biển số xe hợp lệ" 
+        return False, cleaned_text, "Biển số xe không hợp lệ" 

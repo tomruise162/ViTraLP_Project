@@ -20,7 +20,6 @@ app = FastAPI()
 
 # Mount static files for outputs directory
 
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
@@ -34,7 +33,6 @@ OUTPUT_DIR = "outputs/enhanced"
 app.mount("/enhanced", StaticFiles(directory=OUTPUT_DIR), name="enhanced")
 app.mount("/outputs/enhanced", StaticFiles(directory=OUTPUT_DIR), name="outputs-enhanced")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
-ROI_RATIO = (0.32, 0.63, 0.432, 0.336)
 
 def get_db_connection():
     conn = pyodbc.connect(
@@ -75,6 +73,18 @@ def allowed_video(filename):
 def allowed_image(filename):
     return filename.lower().endswith((".jpg", ".jpeg", ".png", ".bmp"))
 
+def get_bottom_half_roi(image):
+    """
+    Lấy nửa dưới của hình ảnh làm ROI
+    """
+    height, width = image.shape[:2]
+    # Tính toán ROI cho nửa dưới
+    x = 0  # Bắt đầu từ cạnh trái
+    y = height // 2  # Bắt đầu từ giữa chiều cao (nửa dưới)
+    w = width  # Toàn bộ chiều rộng
+    h = height // 2  # Nửa chiều cao
+    return image[y:y+h, x:x+w]
+
 @app.post("/process")
 async def process(file: UploadFile = File(...)):
     start_time = time.time()  # Bắt đầu đo thời gian
@@ -98,14 +108,13 @@ async def process(file: UploadFile = File(...)):
             ret, frame = cap.read()
             if not ret:
                 break
-            x = int(ROI_RATIO[0] * width)
-            y = int(ROI_RATIO[1] * height)
-            w = int(ROI_RATIO[2] * width)
-            h = int(ROI_RATIO[3] * height)
-            roi = frame[y:y+h, x:x+w]
+            
+            
+            roi = get_bottom_half_roi(frame)
             roi_rgb = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
             enhanced_roi = enhance_image_prenet_np(roi_rgb)
             yolo_results = detect_license_plates(enhanced_roi, model_path, frame_idx=frame_idx)
+            
             for result in yolo_results:
                 for crop_path in result["crops"]:
                     crop_img = cv2.imread(crop_path) if isinstance(crop_path, str) else crop_path
@@ -143,15 +152,13 @@ async def process(file: UploadFile = File(...)):
         img = cv2.imread(file_location)
         if img is None:
             return {"error": "Cannot read image"}
-        height, width = img.shape[:2]
-        x = int(ROI_RATIO[0] * width)
-        y = int(ROI_RATIO[1] * height)
-        w = int(ROI_RATIO[2] * width)
-        h = int(ROI_RATIO[3] * height)
-        roi = img[y:y+h, x:x+w]
+        
+        
+        roi = get_bottom_half_roi(img)
         roi_rgb = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
         enhanced_roi = enhance_image_prenet_np(roi_rgb)
         yolo_results = detect_license_plates(enhanced_roi, model_path, frame_idx=0)
+        
         for result in yolo_results:
             for crop_path in result["crops"]:
                 crop_img = cv2.imread(crop_path) if isinstance(crop_path, str) else crop_path
@@ -244,4 +251,4 @@ def search_recognized_text(q: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main_test:app", host="0.0.0.0", port=8001, reload=True) 
+    uvicorn.run("main_half_bottom:app", host="0.0.0.0", port=8001, reload=True) 
