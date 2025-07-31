@@ -149,7 +149,7 @@ python main_half_bottom.py
 - Server chạy tại: `http://localhost:8001`
 - API docs: `http://localhost:8001/docs`
 
-### 🎨 Cài đặt Frontend
+### Cài đặt Frontend
 
 #### 1. Cài đặt dependencies
 ```bash
@@ -284,7 +284,7 @@ if __name__ == "__main__":
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Lỗi thường gặp:
 
@@ -317,7 +317,7 @@ tail -f logs/app.log
 ```
 ---
 
-## 🤝 Đóng góp
+## Đóng góp
 
 ### Cách đóng góp:
 1. Fork repository
@@ -340,7 +340,7 @@ Dự án này được phát hành dưới MIT License.
 
 ---
 
-## 📞 Liên hệ
+## Liên hệ
 
 - **Email**: tonybdg2061@gmail.com
 - **GitHub**: tomruise162
@@ -348,7 +348,7 @@ Dự án này được phát hành dưới MIT License.
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - PReNet authors cho mô hình tăng cường ảnh
 - YOLOv11 team cho mô hình detection
