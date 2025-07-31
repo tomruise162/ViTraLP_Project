@@ -1,38 +1,38 @@
 # Vietnamese License Plate Recognition Pipeline
 
-## 📋 Mô tả dự án
+## Mô tả dự án
 
 Hệ thống nhận diện biển số xe máy/ô tô Việt Nam từ ảnh **hoặc video**, được xây dựng với pipeline xử lý tiên tiến:
 
-### 🔄 Pipeline xử lý
+### Pipeline xử lý
 1. **Tăng cường ảnh (Enhancement)**: Sử dụng PReNet để khử mưa và tăng chất lượng ảnh
 2. **Phát hiện biển số (Detection)**: Sử dụng YOLOv11 fine-tuned cho biển số Việt Nam
 3. **Nhận diện ký tự (OCR)**: Sử dụng PaddleOCR để đọc ký tự trên biển số
 4. **Lưu trữ dữ liệu**: Kết quả được lưu vào SQL Server với khả năng tránh trùng lặp
 5. **Giao diện web**: Upload ảnh/video và xem kết quả trực tiếp
 
-### ✨ Tính năng chính
-- ✅ Xử lý cả ảnh và video
-- ✅ Tăng cường chất lượng ảnh trong điều kiện mưa
-- ✅ Phát hiện chính xác biển số Việt Nam
-- ✅ OCR với độ chính xác cao
-- ✅ Giao diện web thân thiện
-- ✅ Tìm kiếm biển số đã nhận diện
-- ✅ Tránh lưu trùng lặp dữ liệu
+### Tính năng chính
+- Xử lý cả ảnh và video
+- Tăng cường chất lượng ảnh trong điều kiện mưa
+- Phát hiện chính xác biển số Việt Nam
+- OCR với độ chính xác cao
+- Giao diện web thân thiện
+- Tìm kiếm biển số đã nhận diện
+- Tránh lưu trùng lặp dữ liệu
 
 ---
 
-## 🗂️ Cấu trúc dự án
+## Cấu trúc dự án
 
 ```
 ViTraLP/
-├── 📁 Backend Servers (FastAPI)
+├── Backend Servers (FastAPI)
 │   ├── main_test.py                    # Server chính với ROI processing
 │   ├── main_full_image.py              # Server xử lý toàn bộ ảnh
 │   ├── main_half_bottom.py             # Server xử lý nửa dưới ảnh
 │   └── requirements.txt                 # Thư viện Python cần thiết
 │
-├── 📁 Core Modules
+├── Core Modules
 │   ├── enhancement_prenet_crop.py      # Module tăng cường ảnh PReNet
 │   ├── yolo_detect.py                  # Module phát hiện biển số YOLO
 │   ├── ocr_infer.py                    # Module OCR PaddleOCR
@@ -40,28 +40,28 @@ ViTraLP/
 │   ├── networks.py                      # Kiến trúc mạng PReNet
 │   └── utils.py                         # Tiện ích hỗ trợ
 │
-├── 📁 Frontend (React)
+├── Frontend (React)
 │   └── UI/my-app/
 │       ├── src/App.js                   # Giao diện chính
 │       ├── package.json                 # Dependencies React
 │       └── README.md                    # Hướng dẫn frontend
 │
-├── 📁 Outputs
+├── Outputs
 │   ├── outputs/enhanced/                # Ảnh đã tăng cường
 │   ├── outputs/crops/                   # Ảnh crop biển số
 │   ├── output_yolo_crop_test/           # Ảnh crop test
 │   └── uploaded_images/                 # Ảnh upload tạm thời
 │
-├── 📁 Models & Weights
+├── Models & Weights
 │   ├── yolo_finetuned_weights/          # YOLO weights fine-tuned
 │   ├── original_weights_paddle/         # PaddleOCR weights
 │   └── original_weights_paddle.zip      # PaddleOCR weights (zipped)
 │
-├── 📁 Notebooks & Testing
+├── Notebooks & Testing
 │   ├── test_pipeline.ipynb              # Test pipeline
 │   └── Inference_prenet.ipynb           # Test PReNet
 │
-└── 📄 Documentation & Config
+└── Documentation & Config
     ├── Readme.md                        # File này
     ├── environment.yml                   # Conda environment
     ├── .gitignore                       # Git ignore rules
@@ -71,33 +71,14 @@ ViTraLP/
 
 ---
 
-## 🚀 Hướng dẫn cài đặt & chạy
+## Hướng dẫn cài đặt & chạy
 
-### 📋 Yêu cầu hệ thống
+### Yêu cầu hệ thống
 - **Python**: 3.10.16
 - **Node.js**: 16+ (cho frontend)
 - **SQL Server**: Để lưu trữ dữ liệu
 - **RAM**: Tối thiểu 16GB
 - **GPU**: Khuyến nghị có GPU để tăng tốc độ xử lý
-
-<<<<<<< HEAD
-- **Cài đặt Python 3.10.16**
-- **Cài đặt các thư viện cần thiết:**
-  ```bash
-  pip install -r requirements.txt
-  ```
-- **Tải các file weights (YOLO, PReNet, PaddleOCR) theo hướng dẫn ở cuối README.**
-- **Chuẩn bị và cấu hình SQL Server:**
-  - Cài đặt SQL Server (nếu bạn chưa có).
-  - Chạy script trong file `script.sql` để tạo database `OCR_DB` và bảng `DETECTED_NUMBER`.
-  - Chỉnh thông tin kết nối SQL Server trong `main_test.py` cho đúng với máy của bạn (server name, user, password).
-- **Chạy server FastAPI:**
-  ```bash
-  python main_test.py
-  ```
-  - Server mặc định chạy ở `http://localhost:8001`
-  - Ảnh enhanced sẽ được lưu ở `outputs/enhanced/`
-  - API chính: `POST /process` (upload file ảnh/video)
 
 ### 🔧 Cài đặt Backend
 
@@ -245,7 +226,7 @@ npm start
 
 ---
 
-## 🖼️ Giao diện web
+## Giao diện web
 
 ### Tính năng chính:
 - **Upload**: Hỗ trợ drag & drop ảnh/video
@@ -264,7 +245,7 @@ npm start
 
 ---
 
-## 🔧 Cấu hình nâng cao
+## Cấu hình nâng cao
 
 ### Chọn server phù hợp:
 
@@ -334,7 +315,6 @@ python main_test.py --debug
 # Xem logs chi tiết
 tail -f logs/app.log
 ```
-
 ---
 
 ## 🤝 Đóng góp
@@ -362,9 +342,9 @@ Dự án này được phát hành dưới MIT License.
 
 ## 📞 Liên hệ
 
-- **Email**: [tonybdg2061@gmail.com]
-- **GitHub**: [tomruise162]
-- **LinkedIn**: [https://www.linkedin.com/in/giabao16/]
+- **Email**: tonybdg2061@gmail.com
+- **GitHub**: tomruise162
+- **LinkedIn**: https://www.linkedin.com/in/giabao16/
 
 ---
 
