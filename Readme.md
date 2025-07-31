@@ -80,7 +80,7 @@ ViTraLP/
 - **RAM**: Tối thiểu 16GB
 - **GPU**: Khuyến nghị có GPU để tăng tốc độ xử lý
 
-### 🔧 Cài đặt Backend
+### Cài đặt Backend
 
 #### 1. Tạo môi trường Python
 ```bash
@@ -334,7 +334,7 @@ tail -f logs/app.log
 
 ---
 
-## 📄 License
+## License
 
 Dự án này được phát hành dưới MIT License.
 
