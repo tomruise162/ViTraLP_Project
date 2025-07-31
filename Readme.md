@@ -25,23 +25,6 @@ Hệ thống nhận diện biển số xe máy/ô tô Việt Nam từ ảnh **ho
 ## 🗂️ Cấu trúc dự án
 
 ```
-<<<<<<< HEAD
-.
-├── main_test.py                # Backend FastAPI: API xử lý ảnh/video, lưu SQL Server
-├── script.sql                  # Script SQL để khởi tạo database và table
-├── enhancement_prenet_crop.py  # Module tăng cường ảnh bằng PReNet
-├── yolo_detect.py              # Module phát hiện biển số bằng YOLO
-├── ocr_infer.py                # Module nhận diện ký tự bằng PaddleOCR
-├── outputs/
-│   └── enhanced/               # Lưu ảnh enhanced kết quả
-│   └── crops/                  # (nếu dùng) Lưu ảnh crop biển số
-├── UI/
-│   └── my-app/                 # Frontend React
-│       └── src/App.js          # Giao diện upload, hiển thị kết quả
-├── requirements.txt            # Thư viện Python cần thiết cho backend
-├── Readme.md                   # (file này)
-└── ...
-=======
 ViTraLP/
 ├── 📁 Backend Servers (FastAPI)
 │   ├── main_test.py                    # Server chính với ROI processing
@@ -84,7 +67,6 @@ ViTraLP/
     ├── .gitignore                       # Git ignore rules
     ├── structure                        # Cấu trúc dự án gốc
     └── config/                          # Thư mục cấu hình
->>>>>>> 3923d7d (feat: validate text, update readme, modify ROI)
 ```
 
 ---
@@ -116,9 +98,8 @@ ViTraLP/
   - Server mặc định chạy ở `http://localhost:8001`
   - Ảnh enhanced sẽ được lưu ở `outputs/enhanced/`
   - API chính: `POST /process` (upload file ảnh/video)
-=======
+
 ### 🔧 Cài đặt Backend
->>>>>>> 3923d7d (feat: validate text, update readme, modify ROI)
 
 #### 1. Tạo môi trường Python
 ```bash
